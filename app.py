@@ -113,5 +113,5 @@ if uploaded_file is not None:
         st.info(narrative)
 else:
     st.info("Please upload an image to get started.")
- st.markdown("---") 
+st.markdown("---") 
 st,caption("Powered by MC-LLaVA-3B & Streamlit. For Best Results, use clear images, with obvious subjects.")   
