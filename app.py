@@ -29,7 +29,7 @@ with st.expander("What is this app?"):
 
 # User upload image
 uploaded_file = st.file_uploader(
-    "Choose an image file (jpg, jpeg, png)..."
+    "Choose an image file (jpg, jpeg, png)...",
     type = ["jpg", "jpeg", "png"],
     help = "Upload a clear photo (jpg, jpeg, png). Max size: 5MB"
 )
