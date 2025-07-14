@@ -1,7 +1,7 @@
 import streamlit as st
 from PIL import Image
 import torch
-from transformers import AutoProcessor, AutoModelForCasualLM
+from transformers import AutoProcessor, AutoModelForCausalLM
 import re
 
 # Fading function
