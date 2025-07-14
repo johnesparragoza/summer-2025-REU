@@ -1,5 +1,5 @@
 import streamlit as st
-from PIL import image
+from PIL import Image
 import torch
 from transformers import AutoProcessor, AutoModelForCasualLM
 import re
