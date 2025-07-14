@@ -39,7 +39,7 @@ uploaded_file = st.file_uploader(
 def load_model():
     model_id = "visheratin/MC-LLaVA-3b"
     processor = AutoProcessor.from_pretrained(model_id, trust_remote_code=True)
-    model = AutoModelForCasualLM.from_pretrained(
+    model = AutoModelForCausalLM.from_pretrained(
         model_id,
         torch_dtype=torch.float16 if torch.cuda.is_available() else torch.float32,
         trust_remote_code=True
