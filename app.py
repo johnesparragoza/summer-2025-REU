@@ -64,16 +64,16 @@ if uploaded_file is not None:
     # Building/editing prompt
     prompt = (
         "<|im_start|>user\n"
-        f"<image>\nDescribe this image in a single sentence, short and simple, no more than 10 words. \nCaption: {caption}\nNarrative:\n"
+        f"<image>\nDescribe this image in a single sentence, short and simple, no more than 10 words.\nCaption: {caption}\nNarrative:\n"
         "<|im_end|>\n"
         "<|im_start|>assisstant\n"
     )
     #Prepare inputs for model
-    inputs = processor(prompt, images=image, return_tensors="pt")
+    inputs = processor(prompt, [image], model, return_tensors="pt")
     inputs = {k: v.to(model.device) if torch.is_tensor(v) else v for k, v in inputs.items()}
     # Generate narrative
     with torch.no_grad():
-        outputs = model.generate(
+        output = model.generate(
             **inputs,
             max_new_tokens=64,
             use_cache=True,
@@ -86,7 +86,9 @@ if uploaded_file is not None:
     # Extract only the narrative part
     narrative_parts = re.split(r"<\|im_start\|>assistant", generated_text)
     narrative = narrative_parts[-1] if len(narrative_parts) > 1 else generated_text
-    narrative = narrative.split()
+    narrative = narrative.replace("<|im_end|>", "").strip()
+    words = narrative.split()
+
 
     # Fading level 
     if "fade_level" not in st.session_state:
@@ -114,4 +116,4 @@ if uploaded_file is not None:
 else:
     st.info("Please upload an image to get started.")
 st.markdown("---") 
-st,caption("Powered by MC-LLaVA-3B & Streamlit. For Best Results, use clear images, with obvious subjects.")   
+st.caption("Powered by MC-LLaVA-3B & Streamlit. For Best Results, use clear images, with obvious subjects.")   
