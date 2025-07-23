@@ -1,5 +1,5 @@
-# summer-2025-REU
-# Visual Understanding with multi modal architecture for ASD Support
+# summer-2025-REU TXST
+# Image to Narrative with multi modal architecture.
 
 This project implements an image captioning model using (mostly) BLIP-2. It is designed as an assistive tool to help individuals with Autism Spectrum Disorder (ASD) interpret and communicate visual scenes. The model generates descriptive captions for input images and is structured to allow future integration with a language model for narrative generation.
 
@@ -22,4 +22,5 @@ This project implements an image captioning model using (mostly) BLIP-2. It is d
 ├── blip2.ipynb                  # Jupyter Notebook with BLIP-2 captioning pipeline
 ├── images/                      # Folder containing input images
 ├── requirements.txt             # Python dependencies
-└── README.md                    # Project description and usage
+├── README.md                    # Project description and usage
+├──
