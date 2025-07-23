@@ -3,8 +3,10 @@ from PIL import Image
 import torch
 from transformers import AutoProcessor, AutoModelForCausalLM
 import re
+from gtts import gTTS
+import io
 
-# --- Helper: Fading function ---
+# helper: fading function ---
 def get_faded_prompt(words, fade_level):
     """Return the narrative with the last `fade_level` words replaced by blanks."""
     if fade_level == 0:
@@ -15,11 +17,21 @@ def get_faded_prompt(words, fade_level):
     ]
     return " ".join(faded_words)
 
-# --- App UI ---
-st.title("Image to Narrative (with Fading Prompt)")
-st.markdown("Upload an image and get a short narrative with interactive fading. Great for conversation starters!")
+# app UI 
+# Page configuration (sets favicon, title, and center page)
+st.set_page_config(
+    page_title="Image-to-Narrative",
+    layout="centered"
+)
 
-# --- Tooltips & Help ---
+st.markdown("""
+    <div style='text-align: center; padding: 2rem 0;'>
+        <h1 style='color: #9611B3;'>Welcome to the Image Narrator 👋</h1>
+        <p style='font-size: 1.2rem;'>Upload your image and get a friendly, narrated description!</p>
+    </div>
+""", unsafe_allow_html=True)
+
+# tooltips & help 
 with st.expander("What is this app?"):
     st.write("""
     This app helps you describe images in a simple way. 
@@ -27,14 +39,14 @@ with st.expander("What is this app?"):
     Great for conversation practice and social support!
     """)
 
-# --- User uploads image ---
+# user uploads image 
 uploaded_file = st.file_uploader(
     "Choose an image file (jpg, jpeg, png)...", 
     type=["jpg", "jpeg", "png"],
     help="Upload a clear photo (jpg, jpeg, png). Max size: 5MB."
 )
 
-# --- Load model and processor (cache to avoid reloading) ---
+# load model and processor (cache to avoid reloading) 
 @st.cache_resource
 def load_model():
     model_id = "visheratin/MC-LLaVA-3b"
@@ -48,12 +60,18 @@ def load_model():
 
 processor, model = load_model()
 
-if uploaded_file is not None:
-    # Open and display the uploaded image
+# cleaner response code for TTS
+def clean_response(text, prompt):
+    # Remove prompt and special tokens from the generated output
+    cleaned = text.replace(prompt, "")
+    cleaned = re.sub(r"<\|.*?\|>", "", cleaned)
+    return cleaned.strip()
+
+if uploaded_file is not None: # open and display the uploaded image
     image = Image.open(uploaded_file).convert("RGB")
     st.image(image, caption="Your uploaded image", use_container_width=True)
     
-    # Caption input with tooltip
+    # caption input with tooltip
     caption = st.text_input(
         "Optional: Add your own caption for this image",
         "",
@@ -62,14 +80,19 @@ if uploaded_file is not None:
     if not caption:
         caption = " "  # Avoid empty caption in prompt
 
-    # Build/edit prompt
+    # build/edit prompt
     prompt = (
-        "<|im_start|>user\n"
-        f"<image>\nDescribe this image in a single sentence, short and simple, no more than 10 words.\nCaption: {caption}\nNarrative:\n"
-        "<|im_end|>\n"
-        "<|im_start|>assistant\n"
-    )
-    # Prepare inputs for the model
+    "<|im_start|>user\n"
+    "<image>\n"
+    "Describe this image with a single first-person sentence.\n"
+    "Make it short and simple, no more than 10 words.\n"
+    "Use first-person perspective (e.g., 'I see...', 'I feel...').\n"
+    f"Caption: {caption}\n"
+    "Narrative:\n"
+    "<|im_end|>\n"
+    "<|im_start|>assistant\n"
+        )
+    # preparing inputs for the model
     inputs = processor(prompt, [image], model, return_tensors="pt")
     inputs = {k: v.to(model.device) if torch.is_tensor(v) else v for k, v in inputs.items()}
     # Generate narrative
@@ -90,27 +113,35 @@ if uploaded_file is not None:
     narrative = narrative.replace("<|im_end|>", "").strip()
     words = narrative.split()
     
-    # --- Session State for Fade Level ---
+    # state for Fade Level
     if "fade_level" not in st.session_state:
         st.session_state.fade_level = 0
     max_fade = len(words)
 
-    # --- Buttons for Fading ---
+    # buttons for fading
     col1, col2, col3 = st.columns([1,2,1])
     with col1:
-        if st.button(" <- Fade Less", help="Show more of the prompt (remove one blank)"):
+        if st.button("Fade Less", help="Show more of the prompt (remove one blank)"):
             if st.session_state.fade_level > 0:
                 st.session_state.fade_level -= 1
     with col3:
-        if st.button("Fade More ->", help="Fade one more word from the end"):
+        if st.button("Fade More", help="Fade one more word from the end"):
             if st.session_state.fade_level < max_fade:
                 st.session_state.fade_level += 1
 
     faded_prompt = get_faded_prompt(words, st.session_state.fade_level)
     st.markdown("**Your Practice Prompt:**")
     st.success(faded_prompt)
+    
+    # TTS Button 
+    if st.button("🔊 Read Aloud"):
+        tts = gTTS(narrative)
+        mp3_fp = io.BytesIO()
+        tts.write_to_fp(mp3_fp)
+        mp3_fp.seek(0)
+        st.audio(mp3_fp, format="audio/mp3")
 
-    # Optionally, let a supporter/teacher reveal the full narrative if needed
+    # optional, let a supporter/teacher reveal the full narrative if needed
     with st.expander("Show full narrative (for supporter/teacher use)"):
         st.info(narrative)
 else:
