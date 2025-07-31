@@ -16,6 +16,10 @@ This project implements an image captioning model using (mostly) BLIP-2 & MC-LLa
 ├── mc-llava_training.py           # fine tuning code for MC-LLaVA
   ├── data_processing.py           # data pre-processing code
 
+├── MC_LLaVA_model.py              # fine tuning attempt of MC-LLaVA w/ flickr30k dataset. No preprocessing. Collate function difficulties.
+
+├──mc-llava-metric-train.py        # failed attempt at receiving metrics for MC-LLaVA. issues with GPU + HPC.
+
 ├── Blip_2-Training_v3.py          # blip-2 fine tuning w/ flickr30k dataset with metrics implemented
 
 ├── prompt_fading.ipynb          # initial implementation of MC-LLaVA with prompt fading feature (failed because widgets would not load on notebook)
