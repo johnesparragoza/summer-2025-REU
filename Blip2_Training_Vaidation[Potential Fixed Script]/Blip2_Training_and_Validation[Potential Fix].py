@@ -31,6 +31,7 @@ os.makedirs(checkpoint_dir, exist_ok=True)          # Ensure checkpoint folder e
 #Have not evalauted the script effectivness due to time constraints
 #Added a frozen layer and ensure that the 5 captions are partnered with each image.
 #BERTScore was added for future data analysis discussions.
+#Uses the EgoCap and EgoFormer data set-used for first person caption narratives
 
 # ===== Load Captions into DataFrame =====
 df = pd.read_csv(captions_file, header=None, names=["image_name", "idx", "caption"], sep=",")
