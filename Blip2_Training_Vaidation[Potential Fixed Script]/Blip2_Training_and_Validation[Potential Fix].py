@@ -19,7 +19,7 @@ from pathlib import Path                         # File path handling
 # ===== Configuration =====
 captions_file = "Flicker30k_Captions/captions.txt"  # Captions file path
 images_dir = "Flicker30k_Dataset"                   # Image dataset folder
-model_name = "Salesforce/blip2-opt-2.7b"            # Base BLIP-2 model
+model_name = "Salesforce/blip2-opt-6.7b"            # Base BLIP-2 model
 batch_size, accumulation_steps = 8, 4               # Batch & gradient accumulation
 learning_rate = 1e-4                                # Training learning rate
 num_epochs = 3                                      # Training epochs
